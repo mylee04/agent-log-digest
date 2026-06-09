@@ -17,7 +17,7 @@ describe("formatJson", () => {
       groups: [],
       nextCommands: [],
       artifacts: {},
-      meta: { generatedAt: "2026-06-09T00:00:00.000Z", packageName: "agent-log-digest", packageVersion: "0.1.0", truncated: false, redacted: true }
+      meta: { generatedAt: "2026-06-09T00:00:00.000Z", packageName: "agent-log-digest", packageVersion: "0.1.1", truncated: false, redacted: true }
     })
 
     expect(JSON.parse(text)).toMatchObject({ schemaVersion: "0.1" })

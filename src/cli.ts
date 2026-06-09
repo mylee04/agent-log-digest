@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from "node:url"
+import { realpathSync } from "node:fs"
+import { fileURLToPath } from "node:url"
 import process from "node:process"
 import { readFile } from "node:fs/promises"
 
@@ -23,7 +24,20 @@ Usage:
   agent-log-digest parse <file> [options]
   agent-log-digest doctor
 `
-const CLI_VERSION = "0.1.0"
+const CLI_VERSION = "0.1.1"
+
+const realpathOrOriginal = (path: string): string => {
+  try {
+    return realpathSync(path)
+  } catch {
+    return path
+  }
+}
+
+export const isCliEntrypoint = (moduleUrl: string, argvPath: string | undefined): boolean => {
+  if (argvPath === undefined) return false
+  return realpathOrOriginal(fileURLToPath(moduleUrl)) === realpathOrOriginal(argvPath)
+}
 
 const formatPrettyDoctor = (report: Awaited<ReturnType<typeof createDoctorReport>>): string =>
   [
@@ -151,7 +165,7 @@ export const runCli = async (argv: readonly string[]): Promise<number> => {
   return parsed.alwaysZero ? 0 : runResult.exitCode
 }
 
-const isEntrypoint = import.meta.url === pathToFileURL(process.argv[1] ?? "").href
+const isEntrypoint = isCliEntrypoint(import.meta.url, process.argv[1])
 if (isEntrypoint) {
   try {
     process.exitCode = await runCli(process.argv.slice(2))

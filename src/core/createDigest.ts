@@ -106,7 +106,7 @@ export const createDigest = (input: CreateDigestInput): AgentLogDigest => {
     meta: {
       generatedAt: new Date().toISOString(),
       packageName: "agent-log-digest",
-      packageVersion: "0.1.0",
+      packageVersion: "0.1.1",
       truncated: input.truncated,
       redacted: input.redacted,
       ...(input.timedOut === undefined ? {} : { timedOut: input.timedOut })

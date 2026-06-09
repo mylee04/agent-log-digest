@@ -22,5 +22,6 @@ describe("createDigest", () => {
       count: 1
     })
     expect(digest.nextCommands).toContain("pnpm tsc --noEmit --pretty false")
+    expect(digest.meta.packageVersion).toBe("0.1.1")
   })
 })
