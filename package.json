@@ -29,7 +29,7 @@
     "node": ">=22"
   },
   "bin": {
-    "agent-log-digest": "./dist/cli.js"
+    "agent-log-digest": "dist/cli.js"
   },
   "exports": {
     ".": {
