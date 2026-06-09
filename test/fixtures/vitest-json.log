@@ -1,0 +1,16 @@
+{
+  "numFailedTests": 1,
+  "testResults": [
+    {
+      "name": "/repo/src/user.test.ts",
+      "assertionResults": [
+        {
+          "fullName": "UserService returns user",
+          "status": "failed",
+          "failureMessages": ["expected 5 to be 4"],
+          "location": { "line": 42, "column": 15 }
+        }
+      ]
+    }
+  ]
+}

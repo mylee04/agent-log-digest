@@ -1,0 +1,14 @@
+[
+  {
+    "filePath": "/repo/src/index.ts",
+    "messages": [
+      {
+        "ruleId": "no-unused-vars",
+        "severity": 2,
+        "message": "'foo' is assigned a value but never used.",
+        "line": 10,
+        "column": 7
+      }
+    ]
+  }
+]

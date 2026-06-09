@@ -1,0 +1,10 @@
+FAIL src/user.test.ts
+  UserService
+    x returns user
+
+  UserService > returns user
+
+    Expected: 123
+    Received: 456
+
+      at Object.<anonymous> (src/user.test.ts:42:15)

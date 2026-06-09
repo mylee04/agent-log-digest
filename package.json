@@ -1,0 +1,61 @@
+{
+  "name": "agent-log-digest",
+  "version": "0.1.0",
+  "description": "Turn noisy test, lint, typecheck, and build logs into clean JSON for AI coding agents.",
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://github.com/mylee04/agent-log-digest#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mylee04/agent-log-digest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mylee04/agent-log-digest/issues"
+  },
+  "keywords": [
+    "ai",
+    "ai-coding-agent",
+    "build",
+    "cli",
+    "codex",
+    "eslint",
+    "jest",
+    "lint",
+    "logs",
+    "typescript",
+    "vitest"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "agent-log-digest": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./cli": "./dist/cli.js"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "README.ko.md",
+    "LICENSE",
+    "AGENTS.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts src/cli.ts --format esm --dts --sourcemap --clean --out-dir dist",
+    "dev": "tsup src/index.ts src/cli.ts --format esm --dts --sourcemap --watch --out-dir dist",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}
