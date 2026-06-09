@@ -28,9 +28,10 @@ The publish workflow uses npm trusted publishing through GitHub Actions OIDC. Co
 - repository owner: `mylee04`
 - repository name: `agent-log-digest`
 - workflow filename: `publish-npm.yml`
+- environment name: leave blank
 - allowed action: `npm publish`
 
-The workflow uses a GitHub-hosted Ubuntu runner, grants `id-token: write`, and installs npm `>=11.5.1` on Node `22.14.0`.
+The workflow uses a GitHub-hosted Ubuntu runner, grants `id-token: write`, installs npm `>=11.5.1` on Node `22.14.0`, and publishes with provenance.
 
 ## Publish
 

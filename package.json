@@ -28,6 +28,10 @@
   "engines": {
     "node": ">=22"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "bin": {
     "agent-log-digest": "dist/cli.js"
   },
