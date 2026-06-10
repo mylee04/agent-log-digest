@@ -1,0 +1,9 @@
+Failed to compile.
+
+./app/page.tsx:12:7
+Type error: Type 'string' is not assignable to type 'number'.
+
+  10 | export default function Page() {
+  11 |   const count: number = "oops"
+> 12 |   return <main>{count}</main>
+     |       ^

@@ -8,6 +8,9 @@ export const formatMarkdown = (digest: AgentLogDigest): string => {
     const location = problemLocation(problem)
     return `${index + 1}. \`${location.length > 0 ? location : problem.tool}\`\n   - Message: \`${problem.message}\``
   })
+  const groups = digest.groups.map((group) =>
+    `- ${group.label}: ${group.count}`
+  )
   const commands = digest.nextCommands.map((command) => `\`${command}\``)
 
   return [
@@ -24,6 +27,10 @@ export const formatMarkdown = (digest: AgentLogDigest): string => {
     "## Top problems",
     "",
     problems.length > 0 ? problems.join("\n") : "None",
+    "",
+    "## Groups",
+    "",
+    groups.length > 0 ? groups.join("\n") : "None",
     "",
     "## Suggested next commands",
     "",

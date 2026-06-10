@@ -5,6 +5,9 @@ export const SUPPORTED_TOOLS = [
   "eslint",
   "vitest",
   "jest",
+  "next",
+  "vite",
+  "playwright",
   "generic"
 ] as const
 
@@ -28,6 +31,15 @@ export const detectTools = (command: string, log: string): readonly ToolName[] =
   }
   if (/\bjest\b/.test(lowerCommand) || /jest/i.test(log)) {
     tools.add("jest")
+  }
+  if (/\bnext\b/.test(lowerCommand) || /Failed to compile\./.test(log)) {
+    tools.add("next")
+  }
+  if (/\bvite\b/.test(lowerCommand) || /\[vite\]:/.test(log)) {
+    tools.add("vite")
+  }
+  if (/\bplaywright\b/.test(lowerCommand) || /Running \d+ tests? using \d+ workers?/.test(log)) {
+    tools.add("playwright")
   }
   if (tools.size === 0) {
     tools.add("generic")

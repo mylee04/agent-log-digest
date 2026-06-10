@@ -17,5 +17,6 @@ describe("formatPretty", () => {
     })
 
     expect(formatPretty(digest)).toContain("failed")
+    expect(formatPretty(digest)).toContain("Next: pnpm tsc")
   })
 })

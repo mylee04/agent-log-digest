@@ -7,6 +7,7 @@ import { readFile } from "node:fs/promises"
 
 import { parseCliArgs } from "./cli/parseArgs.js"
 import { createDoctorReport } from "./cli/doctor.js"
+import { initProject } from "./cli/initProject.js"
 import { createDigest } from "./core/createDigest.js"
 import { redactSecrets } from "./core/redact.js"
 import { formatJson } from "./formatters/json.js"
@@ -17,14 +18,26 @@ import { runWrappedCommand } from "./run/runWrappedCommand.js"
 import { writeArtifacts } from "./run/writeArtifacts.js"
 import type { AgentLogDigest } from "./core/types.js"
 
+export const REPOSITORY_URL = "https://github.com/mylee04/agent-log-digest"
+export const STAR_PROMPT = "If this helps, star the repo so others can find it."
+
+const SUPPORT_TEXT = [`Project: ${REPOSITORY_URL}`, STAR_PROMPT].join("\n")
+
 export const CLI_HELP = `agent-log-digest
 
 Usage:
   agent-log-digest [options] -- <command...>
   agent-log-digest parse <file> [options]
   agent-log-digest doctor
+  agent-log-digest repo
+  agent-log-digest support
+  agent-log-digest init
+
+Project:
+  ${REPOSITORY_URL}
+  ${STAR_PROMPT}
 `
-const CLI_VERSION = "0.1.1"
+const CLI_VERSION = "0.1.2"
 
 const realpathOrOriginal = (path: string): string => {
   try {
@@ -44,7 +57,9 @@ const formatPrettyDoctor = (report: Awaited<ReturnType<typeof createDoctorReport
     `ok: ${report.ok}`,
     `node: ${report.node}`,
     `packageManager: ${report.packageManager}`,
-    `recommendations: ${report.recommendations.join("; ")}`
+    `recommendations: ${report.recommendations.join("; ")}`,
+    "",
+    SUPPORT_TEXT
   ].join("\n")
 
 const formatDigest = (digest: AgentLogDigest, format: "json" | "markdown" | "pretty"): string => {
@@ -81,6 +96,19 @@ export const runCli = async (argv: readonly string[]): Promise<number> => {
     process.stdout.write(`${CLI_VERSION}\n`)
     return 0
   }
+  if (parsed.kind === "repo") {
+    process.stdout.write(`${SUPPORT_TEXT}\n`)
+    return 0
+  }
+  if (parsed.kind === "init") {
+    const result = await initProject(parsed.cwd, parsed.force)
+    if (!result.ok) {
+      process.stderr.write(`${result.message}\n`)
+      return 2
+    }
+    process.stdout.write(`Created ${result.files.join(", ")}\n`)
+    return 0
+  }
   if (parsed.kind === "usage-error") {
     process.stderr.write(`${parsed.message}\n`)
     return parsed.exitCode
@@ -93,6 +121,7 @@ export const runCli = async (argv: readonly string[]): Promise<number> => {
   }
 
   if (parsed.kind === "parse") {
+    const command = redactSecrets(`parse ${parsed.file}`)
     let rawLog: string
     try {
       rawLog = await readFile(parsed.file, "utf8")
@@ -102,7 +131,7 @@ export const runCli = async (argv: readonly string[]): Promise<number> => {
     }
     const log = parsed.redact ? redactSecrets(rawLog) : rawLog
     const digest = createDigest({
-      command: `parse ${parsed.file}`,
+      command,
       cwd: parsed.cwd,
       exitCode: null,
       durationMs: 0,
@@ -136,8 +165,9 @@ export const runCli = async (argv: readonly string[]): Promise<number> => {
     ...(parsed.timeoutMs === undefined ? {} : { timeoutMs: parsed.timeoutMs })
   })
   const log = parsed.redact ? redactSecrets(runResult.rawLog) : runResult.rawLog
+  const command = redactSecrets(parsed.commandArgs.join(" "))
   const digest = createDigest({
-    command: parsed.commandArgs.join(" "),
+    command,
     cwd: parsed.cwd,
     exitCode: runResult.exitCode,
     durationMs: runResult.durationMs,

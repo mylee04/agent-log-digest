@@ -1,0 +1,10 @@
+Running 1 test using 1 worker
+
+  1) tests/login.spec.ts:8:5 › login flow › shows dashboard
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('Dashboard')
+
+  1 failed
+    tests/login.spec.ts:8:5 › login flow › shows dashboard

@@ -1,0 +1,6 @@
+vite v6.0.0 building for production...
+transforming...
+[vite]: Rollup failed to resolve import "./missing" from "src/main.ts".
+file: /repo/src/main.ts:3:18
+error during build:
+Error: Could not resolve "./missing" from "src/main.ts"

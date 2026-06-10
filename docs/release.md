@@ -17,7 +17,11 @@ Run CLI smoke checks:
 ```bash
 node dist/cli.js --json --always-zero -- node test/fixtures/commands/fail-tsc-like.mjs
 node dist/cli.js parse test/fixtures/eslint-json.log --tool eslint --json
+node dist/cli.js parse test/fixtures/next-build.log --tool next --json
+node dist/cli.js parse test/fixtures/vite-build.log --tool vite --json
+node dist/cli.js parse test/fixtures/playwright-report.log --tool playwright --json
 node dist/cli.js doctor --json
+node dist/cli.js repo
 ```
 
 ## npm Trusted Publishing

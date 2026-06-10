@@ -58,7 +58,7 @@ const schemaFixture = {
   meta: {
     generatedAt: "2026-06-09T00:00:00.000Z",
     packageName: "agent-log-digest",
-    packageVersion: "0.1.1",
+    packageVersion: "0.1.2",
     truncated: false,
     redacted: true
   }

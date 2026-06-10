@@ -45,11 +45,14 @@ const groupProblems = (problems: readonly Problem[]): readonly ProblemGroup[] =>
   const groups = new Map<string, ProblemGroup>()
   for (const problem of problems) {
     const key = `${problem.tool}:${problem.code ?? problem.severity}`
+    const label = problem.testName === undefined
+      ? `${problem.tool} ${problem.code ?? problem.severity}`
+      : `${problem.tool} ${problem.testName}`
     const existing = groups.get(key)
     if (existing === undefined) {
       groups.set(key, {
         key,
-        label: `${problem.tool} ${problem.code ?? problem.severity}`,
+        label,
         count: 1,
         firstProblemId: problem.id
       })
@@ -63,13 +66,28 @@ const groupProblems = (problems: readonly Problem[]): readonly ProblemGroup[] =>
   return [...groups.values()]
 }
 
+const commandIncludesExecutable = (command: string, executable: string): boolean =>
+  command.split(/\s+/).some((part) => part === executable || part.endsWith(`/${executable}`))
+
 const nextCommands = (command: string, problems: readonly Problem[]): readonly string[] => {
   const first = problems[0]
   if (first?.tool === "typescript") {
     return [command.includes("tsc") ? command : "pnpm tsc --noEmit --pretty false"]
   }
+  if (first?.tool === "eslint" && first.file !== undefined) {
+    return [`eslint ${first.file} --format json`]
+  }
   if ((first?.tool === "vitest" || first?.tool === "jest") && first.file !== undefined) {
     return [`pnpm test ${first.file}`]
+  }
+  if (first?.tool === "next") {
+    return [commandIncludesExecutable(command, "next") ? command : "next build"]
+  }
+  if (first?.tool === "vite") {
+    return [commandIncludesExecutable(command, "vite") ? command : "vite build"]
+  }
+  if (first?.tool === "playwright" && first.file !== undefined) {
+    return [`playwright test ${first.file}`]
   }
   return command.length > 0 ? [command] : []
 }
@@ -106,7 +124,7 @@ export const createDigest = (input: CreateDigestInput): AgentLogDigest => {
     meta: {
       generatedAt: new Date().toISOString(),
       packageName: "agent-log-digest",
-      packageVersion: "0.1.1",
+      packageVersion: "0.1.2",
       truncated: input.truncated,
       redacted: input.redacted,
       ...(input.timedOut === undefined ? {} : { timedOut: input.timedOut })

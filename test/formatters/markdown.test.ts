@@ -20,6 +20,7 @@ describe("formatMarkdown", () => {
 
     expect(markdown).toContain("## Summary")
     expect(markdown).toContain("## Top problems")
+    expect(markdown).toContain("## Groups")
     expect(markdown).toContain("## Suggested next commands")
   })
 })

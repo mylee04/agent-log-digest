@@ -1,10 +1,18 @@
 # agent-log-digest
 
+[![npm version](https://img.shields.io/npm/v/agent-log-digest)](https://www.npmjs.com/package/agent-log-digest)
+[![npm downloads](https://img.shields.io/npm/dw/agent-log-digest)](https://www.npmjs.com/package/agent-log-digest)
+[![CI](https://github.com/mylee04/agent-log-digest/actions/workflows/ci.yml/badge.svg)](https://github.com/mylee04/agent-log-digest/actions/workflows/ci.yml)
+[![GitHub stars](https://img.shields.io/github/stars/mylee04/agent-log-digest)](https://github.com/mylee04/agent-log-digest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 [한국어 README](./README.ko.md)
 
 Turn noisy test, lint, typecheck, and build logs into compact JSON that AI coding agents can route, summarize, and store.
 
 `agent-log-digest` is a local-only Node CLI. It runs a command or parses an existing log file, redacts common secrets by default, detects known tool output, and writes deterministic digests without telemetry, hosted services, or LLM calls.
+
+If this CLI saves you time, please [star the GitHub repo](https://github.com/mylee04/agent-log-digest). It helps other developers discover local-only tooling for AI coding agents.
 
 ## Install
 
@@ -50,6 +58,54 @@ Check local runtime assumptions:
 agent-log-digest doctor --json
 ```
 
+Print the project URL:
+
+```bash
+agent-log-digest repo
+```
+
+Write local example files explicitly:
+
+```bash
+agent-log-digest init
+```
+
+## CI Recipe
+
+Keep a CI step green while saving a structured digest for agents:
+
+```yaml
+- name: Test with digest
+  run: npx agent-log-digest --json --always-zero --output ./agent-log-digest.json -- npm test
+```
+
+## Before and After
+
+TypeScript log:
+
+```text
+src/user.ts(3,7): error TS2322: Type string is not assignable to number.
+```
+
+Digest summary:
+
+```json
+{"status":"failed","detectedTools":["typescript"],"summary":{"headline":"TypeScript failed with 1 error in 1 file."}}
+```
+
+Vite build log:
+
+```text
+[vite]: Rollup failed to resolve import "./missing" from "src/main.ts".
+file: /repo/src/main.ts:3:18
+```
+
+Digest summary:
+
+```json
+{"status":"failed","detectedTools":["vite"],"nextCommands":["vite build"]}
+```
+
 ## Output
 
 The JSON output uses schema version `0.1`.
@@ -85,6 +141,9 @@ import type { AgentLogDigest, Problem } from "agent-log-digest"
 - ESLint JSON formatter and minimal stylish output
 - Vitest JSON-style failed test results
 - Jest JSON-style failed test results
+- Next.js text build failures
+- Vite/Rollup text build failures
+- Playwright text/list reporter failures
 - Generic Node-style stack traces and `file:line:column` references
 
 ## CLI Options
@@ -101,7 +160,7 @@ import type { AgentLogDigest, Problem } from "agent-log-digest"
 - `--no-stream`: capture command output without live passthrough.
 - `--notify`: call `code-notify` or `cn` if available.
 - `--redact`, `--no-redact`: enable or disable secret redaction.
-- `--tool <name>`: force parser preference for `typescript`, `eslint`, `vitest`, `jest`, or `generic`.
+- `--tool <name>`: force parser preference for `typescript`, `eslint`, `vitest`, `jest`, `next`, `vite`, `playwright`, or `generic`.
 
 Usage errors exit `2`. Internal CLI errors exit `1`. Wrapped command exit codes are preserved unless `--always-zero` is set.
 

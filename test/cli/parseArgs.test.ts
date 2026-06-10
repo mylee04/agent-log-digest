@@ -108,4 +108,37 @@ describe("parseCliArgs", () => {
 
     expect(result.format).toBe("markdown")
   })
+
+  it("returns repo command for repo and support aliases", () => {
+    const repoResult = parseCliArgs(["repo"])
+    const supportResult = parseCliArgs(["support"])
+
+    if (repoResult.kind !== "repo") {
+      throw new Error("Expected repo command")
+    }
+    if (supportResult.kind !== "repo") {
+      throw new Error("Expected support command to use repo output")
+    }
+  })
+
+  it("preserves forced tool names at the argument boundary", () => {
+    const result = parseCliArgs(["parse", "test.log", "--tool", "playwright"])
+
+    if (result.kind !== "parse") {
+      throw new Error("Expected parse command")
+    }
+
+    expect(result.tool).toBe("playwright")
+  })
+
+  it("returns init command with force flag and cwd", () => {
+    const result = parseCliArgs(["init", "--cwd", "/tmp/project", "--force"])
+
+    if (result.kind !== "init") {
+      throw new Error("Expected init command")
+    }
+
+    expect(result.cwd).toBe("/tmp/project")
+    expect(result.force).toBe(true)
+  })
 })

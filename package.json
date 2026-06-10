@@ -1,6 +1,6 @@
 {
   "name": "agent-log-digest",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Turn noisy test, lint, typecheck, and build logs into clean JSON for AI coding agents.",
   "type": "module",
   "license": "MIT",

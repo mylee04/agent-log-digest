@@ -3,7 +3,10 @@ import type { Problem, ToolName } from "../core/types.js"
 import { parseESLint } from "./eslint.js"
 import { parseGenericStack } from "./genericStack.js"
 import { parseJest } from "./jest.js"
+import { parseNext } from "./next.js"
+import { parsePlaywright } from "./playwright.js"
 import { parseTypeScript } from "./typescript.js"
+import { parseVite } from "./vite.js"
 import { parseVitest } from "./vitest.js"
 
 export interface ParseProblemsInput {
@@ -22,11 +25,14 @@ const parseByTool = (tool: ToolName, log: string): readonly Problem[] => {
       return parseVitest(log)
     case "jest":
       return parseJest(log)
+    case "next":
+      return parseNext(log)
+    case "vite":
+      return parseVite(log)
+    case "playwright":
+      return parsePlaywright(log)
     case "generic":
       return parseGenericStack(log)
-    case "next":
-    case "vite":
-    case "playwright":
     case "unknown":
       return []
   }
