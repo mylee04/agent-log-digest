@@ -1,4 +1,7 @@
 import { spawn } from "node:child_process"
+import { cp, mkdtemp, rm, symlink } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import { describe, expect, it } from "vitest"
 
 type ProcessResult = {
@@ -9,11 +12,12 @@ type ProcessResult = {
 
 const runProcess = (
   command: string,
-  args: readonly string[]
+  args: readonly string[],
+  cwd = process.cwd()
 ): Promise<ProcessResult> =>
   new Promise((resolve, reject) => {
     const child = spawn(command, [...args], {
-      cwd: process.cwd(),
+      cwd,
       shell: false
     })
     let stdout = ""
@@ -36,6 +40,28 @@ const runProcess = (
       })
     })
   })
+
+const copyPackageWorkspace = async (): Promise<string> => {
+  const target = await mkdtemp(join(tmpdir(), "agent-log-digest-pack-"))
+  const files = [
+    "AGENTS.md",
+    "LICENSE",
+    "README.ko.md",
+    "README.md",
+    "package-lock.json",
+    "package.json",
+    "src",
+    "tsconfig.json"
+  ]
+
+  for (const file of files) {
+    await cp(join(process.cwd(), file), join(target, file), {
+      recursive: true
+    })
+  }
+  await symlink(join(process.cwd(), "node_modules"), join(target, "node_modules"), "dir")
+  return target
+}
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value)
@@ -71,27 +97,35 @@ const parsePackedFilePaths = (text: string): readonly string[] => {
 
 describe("package contents", () => {
   it("packs intended runtime files and excludes development artifacts", async () => {
-    const result = await runProcess("npm", ["pack", "--json", "--dry-run"])
-    expect(result.code).toBe(0)
+    const workspace = await copyPackageWorkspace()
+    try {
+      const build = await runProcess("npm", ["run", "build"], workspace)
+      expect(build.code).toBe(0)
 
-    const files = parsePackedFilePaths(result.stdout)
-    expect(files).toEqual(expect.arrayContaining([
-      "dist/cli.js",
-      "dist/index.js",
-      "dist/cli.d.ts",
-      "dist/index.d.ts",
-      "README.md",
-      "README.ko.md",
-      "LICENSE",
-      "AGENTS.md",
-      "package.json"
-    ]))
-    expect(files.some((file) =>
-      file.startsWith("src/")
-      || file.startsWith("test/")
-      || file.startsWith(".omo/")
-      || file.startsWith("plans/")
-      || file.startsWith("evidence/")
-    )).toBe(false)
-  }, 30_000)
+      const result = await runProcess("npm", ["pack", "--ignore-scripts", "--json", "--dry-run"], workspace)
+      expect(result.code).toBe(0)
+
+      const files = parsePackedFilePaths(result.stdout)
+      expect(files).toEqual(expect.arrayContaining([
+        "dist/cli.js",
+        "dist/index.js",
+        "dist/cli.d.ts",
+        "dist/index.d.ts",
+        "README.md",
+        "README.ko.md",
+        "LICENSE",
+        "AGENTS.md",
+        "package.json"
+      ]))
+      expect(files.some((file) =>
+        file.startsWith("src/")
+        || file.startsWith("test/")
+        || file.startsWith(".omo/")
+        || file.startsWith("plans/")
+        || file.startsWith("evidence/")
+      )).toBe(false)
+    } finally {
+      await rm(workspace, { force: true, recursive: true })
+    }
+  }, 45_000)
 })
